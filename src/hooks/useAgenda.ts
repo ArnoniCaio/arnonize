@@ -98,9 +98,14 @@ export function useCreateEvent() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: Omit<Event, 'id' | 'created_at'>) => {
-      const { error } = await supabase.from('events').insert(data)
-      if (error) throw error
+      const { data: result, error } = await supabase.from('events').insert(data).select()
+      if (error) {
+        console.error('useCreateEvent error:', error)
+        throw error
+      }
+      return result
     },
+    onError: (error) => console.error('useCreateEvent mutation error:', error),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['events'] })
   })
 }
@@ -109,9 +114,14 @@ export function useCreateTask() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: Omit<Task, 'id' | 'created_at'>) => {
-      const { error } = await supabase.from('tasks').insert(data)
-      if (error) throw error
+      const { data: result, error } = await supabase.from('tasks').insert(data).select()
+      if (error) {
+        console.error('useCreateTask error:', error)
+        throw error
+      }
+      return result
     },
+    onError: (error) => console.error('useCreateTask mutation error:', error),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks'] })
   })
 }
@@ -120,7 +130,78 @@ export function useCreateHabit() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: Omit<Habit, 'id' | 'created_at'>) => {
-      const { error } = await supabase.from('habits').insert(data)
+      const { data: result, error } = await supabase.from('habits').insert(data).select()
+      if (error) {
+        console.error('useCreateHabit error:', error)
+        throw error
+      }
+      return result
+    },
+    onError: (error) => console.error('useCreateHabit mutation error:', error),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['habits'] })
+  })
+}
+
+export function useUpdateEvent() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...data }: Partial<Event> & { id: string }) => {
+      const { error } = await supabase.from('events').update(data).eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['events'] })
+  })
+}
+
+export function useDeleteEvent() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('events').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['events'] })
+  })
+}
+
+export function useUpdateTask() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...data }: Partial<Task> & { id: string }) => {
+      const { error } = await supabase.from('tasks').update(data).eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks'] })
+  })
+}
+
+export function useDeleteTask() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('tasks').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks'] })
+  })
+}
+
+export function useUpdateHabit() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...data }: Partial<Habit> & { id: string }) => {
+      const { error } = await supabase.from('habits').update(data).eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['habits'] })
+  })
+}
+
+export function useDeleteHabit() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('habits').delete().eq('id', id)
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['habits'] })
