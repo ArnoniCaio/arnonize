@@ -8,13 +8,20 @@ import { HabitRow } from '@/components/agenda/HabitRow'
 import { EventForm } from '@/components/agenda/EventForm'
 import { TaskForm } from '@/components/agenda/TaskForm'
 import { HabitForm } from '@/components/agenda/HabitForm'
+import { BottomSheet } from '@/components/ui/BottomSheet'
 import { useEvents, useTasks, useHabits, useHabitLogs } from '@/hooks/useAgenda'
 
 type FormType = 'event' | 'task' | 'habit' | null
 
+const CREATE_OPTIONS = [
+  { type: 'event' as FormType, icon: 'ti-calendar-plus', label: 'Evento',  desc: 'Compromisso com horário' },
+  { type: 'task'  as FormType, icon: 'ti-circle-plus',   label: 'Tarefa',  desc: 'Item com prazo e prioridade' },
+  { type: 'habit' as FormType, icon: 'ti-repeat',        label: 'Hábito',  desc: 'Rotina para acompanhar' },
+]
+
 export function Agenda() {
-  const [selected, setSelected] = useState(new Date())
-  const [fabOpen, setFabOpen] = useState(false)
+  const [selected, setSelected]     = useState(new Date())
+  const [pickerOpen, setPickerOpen] = useState(false)
   const [activeForm, setActiveForm] = useState<FormType>(null)
 
   const { data: events = [] }    = useEvents(selected)
@@ -25,44 +32,25 @@ export function Agenda() {
   const dateLabel = format(selected, "EEEE, d 'de' MMMM", { locale: ptBR })
 
   function openForm(type: FormType) {
-    setFabOpen(false)
-    setActiveForm(type)
+    setPickerOpen(false)
+    setTimeout(() => setActiveForm(type), 150)
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="w-full min-h-screen bg-[#0a0a0f] overflow-x-hidden">
       <div className="pt-12 pb-3 px-4 flex items-center justify-between">
         <h1 className="text-[22px] font-bold text-[#e2e2f0] tracking-tight">Agenda</h1>
         <button
-          onClick={() => setFabOpen(v => !v)}
-          className="w-8 h-8 bg-[#6366f1] rounded-full flex items-center justify-center"
+          onClick={() => setPickerOpen(true)}
+          className="w-9 h-9 bg-[#6366f1] rounded-full flex items-center justify-center active:scale-95 transition-transform"
         >
-          <i className={`ti ${fabOpen ? 'ti-x' : 'ti-plus'} text-white`} style={{ fontSize: 16 }} />
+          <i className="ti ti-plus text-white" style={{ fontSize: 18 }} />
         </button>
       </div>
 
-      {fabOpen && (
-        <div className="absolute right-4 top-20 z-30 bg-[#13131f] border border-[#1e1e32] rounded-2xl overflow-hidden shadow-xl">
-          {[
-            { type: 'event' as FormType, icon: 'ti-calendar-plus', label: 'Novo evento' },
-            { type: 'task'  as FormType, icon: 'ti-circle-plus',   label: 'Nova tarefa' },
-            { type: 'habit' as FormType, icon: 'ti-repeat',        label: 'Novo hábito' },
-          ].map(({ type, icon, label }) => (
-            <button
-              key={type}
-              onClick={() => openForm(type)}
-              className="flex items-center gap-3 px-4 py-3 w-full text-left hover:bg-[#1a1a2e] transition-colors border-b border-[#1e1e32] last:border-0"
-            >
-              <i className={`ti ${icon} text-[#6366f1]`} style={{ fontSize: 18 }} />
-              <span className="text-[14px] text-[#e2e2f0]">{label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
       <DayStrip selected={selected} onSelect={setSelected} />
 
-      <div className="px-4 mb-2">
+      <div className="px-4 mb-3">
         <p className="text-[12px] text-[#6b6b80] capitalize">{dateLabel}</p>
       </div>
 
@@ -101,6 +89,27 @@ export function Agenda() {
           </div>
         )}
       </div>
+
+      <BottomSheet open={pickerOpen} onClose={() => setPickerOpen(false)} title="O que deseja criar?">
+        <div className="flex flex-col gap-2">
+          {CREATE_OPTIONS.map(({ type, icon, label, desc }) => (
+            <button
+              key={type}
+              onClick={() => openForm(type)}
+              className="flex items-center gap-4 p-4 bg-[#13131f] rounded-2xl border border-[#1e1e32] active:bg-[#1a1a2e] transition-colors text-left w-full"
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#2d2b5e] flex items-center justify-center flex-shrink-0">
+                <i className={`ti ${icon} text-[#6366f1]`} style={{ fontSize: 20 }} />
+              </div>
+              <div>
+                <p className="text-[14px] font-semibold text-[#e2e2f0]">{label}</p>
+                <p className="text-[12px] text-[#6b6b80] mt-0.5">{desc}</p>
+              </div>
+              <i className="ti ti-chevron-right text-[#3a3a50] ml-auto" style={{ fontSize: 16 }} />
+            </button>
+          ))}
+        </div>
+      </BottomSheet>
 
       <EventForm open={activeForm === 'event'} onClose={() => setActiveForm(null)} defaultDate={selected} />
       <TaskForm  open={activeForm === 'task'}  onClose={() => setActiveForm(null)} defaultDate={selected} />

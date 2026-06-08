@@ -55,8 +55,8 @@ export function TaskForm({ open, onClose, defaultDate }: Props) {
           <option value="low">Baixa</option>
         </select>
       </FormField>
-      <div className="flex gap-3">
-        <div className="flex-1">
+      <div className="flex gap-3 w-full">
+        <div className="flex-1 min-w-0">
           <FormField label="Prazo">
             <input
               type="date"
@@ -66,7 +66,7 @@ export function TaskForm({ open, onClose, defaultDate }: Props) {
             />
           </FormField>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <FormField label="Tempo estimado (min)">
             <input
               type="number"

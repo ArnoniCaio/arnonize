@@ -61,8 +61,8 @@ export function EventForm({ open, onClose, defaultDate }: Props) {
           onChange={e => setDate(e.target.value)}
         />
       </FormField>
-      <div className="flex gap-3">
-        <div className="flex-1">
+      <div className="flex gap-3 w-full">
+        <div className="flex-1 min-w-0">
           <FormField label="Horário">
             <input
               type="time"
@@ -72,7 +72,7 @@ export function EventForm({ open, onClose, defaultDate }: Props) {
             />
           </FormField>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <FormField label="Duração (min)">
             <input
               type="number"

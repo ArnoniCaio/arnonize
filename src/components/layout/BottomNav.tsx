@@ -28,7 +28,10 @@ export function BottomNav() {
       )}
 
       {drawerOpen && (
-        <div className="fixed bottom-[72px] left-0 right-0 z-50 bg-[#0d0d14] border-t border-[#1e1e2e] rounded-t-2xl p-4">
+        <div
+          className="fixed left-0 right-0 z-50 bg-[#0d0d14] border-t border-[#1e1e2e] rounded-t-2xl p-4"
+          style={{ bottom: 'calc(56px + env(safe-area-inset-bottom))' }}
+        >
           <div className="w-10 h-1 bg-[#1e1e32] rounded-full mx-auto mb-4" />
           <p className="text-[11px] font-semibold text-[#3a3a50] uppercase tracking-widest mb-3 px-1">
             Mais módulos
@@ -41,9 +44,7 @@ export function BottomNav() {
                 onClick={() => setDrawerOpen(false)}
                 className={({ isActive }) =>
                   `flex flex-col items-center gap-2 p-3 rounded-xl text-center transition-colors ${
-                    isActive
-                      ? 'bg-[#2d2b5e] text-[#6366f1]'
-                      : 'bg-[#13131f] text-[#6b6b80]'
+                    isActive ? 'bg-[#2d2b5e] text-[#6366f1]' : 'bg-[#13131f] text-[#6b6b80]'
                   }`
                 }
               >
@@ -55,29 +56,32 @@ export function BottomNav() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 h-[72px] bg-[#0d0d14] border-t border-[#1e1e2e] flex items-center justify-around px-2 pb-3">
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-40 bg-[#0d0d14] border-t border-[#1e1e2e] flex items-center justify-around px-2"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)', height: 'calc(56px + env(safe-area-inset-bottom))' }}
+      >
         {mainNav.map(({ label, path, icon }) => (
           <NavLink
             key={path}
             to={path}
             end={path === '/'}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 px-4 py-1 ${
+              `flex flex-col items-center gap-1 px-3 py-1 ${
                 isActive ? 'text-[#6366f1]' : 'text-[#3a3a50]'
               }`
             }
           >
-            <i className={`ti ${icon} text-[20px]`} />
+            <i className={`ti ${icon} text-[22px]`} />
             <span className="text-[10px] font-medium">{label}</span>
           </NavLink>
         ))}
         <button
           onClick={() => setDrawerOpen(v => !v)}
-          className={`flex flex-col items-center gap-1 px-4 py-1 ${
+          className={`flex flex-col items-center gap-1 px-3 py-1 ${
             drawerOpen ? 'text-[#6366f1]' : 'text-[#3a3a50]'
           }`}
         >
-          <i className="ti ti-dots text-[20px]" />
+          <i className="ti ti-dots text-[22px]" />
           <span className="text-[10px] font-medium">Mais</span>
         </button>
       </nav>
