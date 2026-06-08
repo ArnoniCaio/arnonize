@@ -93,3 +93,36 @@ export function useToggleHabit() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['habit_logs'] })
   })
 }
+
+export function useCreateEvent() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (data: Omit<Event, 'id' | 'created_at'>) => {
+      const { error } = await supabase.from('events').insert(data)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['events'] })
+  })
+}
+
+export function useCreateTask() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (data: Omit<Task, 'id' | 'created_at'>) => {
+      const { error } = await supabase.from('tasks').insert(data)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks'] })
+  })
+}
+
+export function useCreateHabit() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (data: Omit<Habit, 'id' | 'created_at'>) => {
+      const { error } = await supabase.from('habits').insert(data)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['habits'] })
+  })
+}
