@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { DailyCheckin } from '@/types/saude'
-import { useUpsertCheckin, useCheckinHistory } from '@/hooks/useSaude'
-import { format, parseISO } from 'date-fns'
+import { useUpsertCheckin, useCheckinsByMonth } from '@/hooks/useSaude'
+import {
+  format, parseISO, isSameDay, isAfter, startOfDay,
+  eachDayOfInterval, getDay, startOfMonth, endOfMonth,
+} from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 
@@ -59,17 +62,89 @@ function CheckinDetailCard({ checkin }: { checkin: DailyCheckin }) {
   )
 }
 
+function moodColor(checkin: DailyCheckin): string {
+  if (!checkin.mood) return '#6366f1'
+  if (checkin.mood <= 2) return '#ef4444'
+  if (checkin.mood === 3) return '#ba7517'
+  return '#1d9e75'
+}
+
+const WEEK_DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+
+function CheckinCalendar({ checkins, onSelectCheckin, month, year }: {
+  checkins: DailyCheckin[]
+  onSelectCheckin: (c: DailyCheckin) => void
+  month: number
+  year: number
+}) {
+  const today    = startOfDay(new Date())
+  const firstDay = new Date(year, month, 1)
+  const days     = eachDayOfInterval({ start: startOfMonth(firstDay), end: endOfMonth(firstDay) })
+  const startPad = getDay(firstDay)
+
+  function checkinForDay(day: Date): DailyCheckin | null {
+    return checkins.find(c => isSameDay(parseISO(c.date), day)) ?? null
+  }
+
+  return (
+    <div className="bg-[#13131f] rounded-2xl border border-[#1e1e32] p-4">
+      <div className="grid grid-cols-7 mb-2">
+        {WEEK_DAYS.map(d => (
+          <p key={d} className="text-center text-[10px] font-semibold text-[#3a3a50] uppercase">{d}</p>
+        ))}
+      </div>
+      <div className="grid grid-cols-7 gap-y-1">
+        {Array.from({ length: startPad }).map((_, i) => (
+          <div key={`pad-${i}`} />
+        ))}
+        {days.map(day => {
+          const checkin    = checkinForDay(day)
+          const isToday    = isSameDay(day, today)
+          const isFuture   = isAfter(day, today)
+          const isClickable = !!checkin && !isFuture
+
+          return (
+            <button
+              key={day.toISOString()}
+              disabled={!isClickable}
+              onClick={() => isClickable ? onSelectCheckin(checkin!) : undefined}
+              className={`flex flex-col items-center py-1.5 rounded-xl transition-colors ${
+                isToday ? 'bg-[#2d2b5e] border border-[#6366f1]' : ''
+              } ${isClickable ? 'active:opacity-70' : ''}`}
+            >
+              <span className={`text-[13px] font-medium leading-none ${
+                isFuture ? 'text-[#1e1e32]' : isToday ? 'text-[#6366f1]' : checkin ? 'text-[#a5a5c0]' : 'text-[#3a3a50]'
+              }`}>
+                {format(day, 'd')}
+              </span>
+              <div
+                className="w-1.5 h-1.5 rounded-full mt-1"
+                style={{ background: isClickable ? moodColor(checkin!) : 'transparent' }}
+              />
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function CheckinCard({ date, checkin }: Props) {
+  const today = new Date()
   const upsert = useUpsertCheckin()
-  const { data: history = [] } = useCheckinHistory()
 
   const [mood, setMood]     = useState(checkin?.mood ?? 0)
   const [energy, setEnergy] = useState(checkin?.energy ?? 0)
   const [sleep, setSleep]   = useState(checkin?.sleep_hours?.toString() ?? '')
   const [notes, setNotes]   = useState(checkin?.notes ?? '')
   const [saved, setSaved]   = useState(false)
-  const [historyOpen, setHistoryOpen]         = useState(false)
   const [selectedCheckin, setSelectedCheckin] = useState<DailyCheckin | null>(null)
+  const [calendarYear, setCalendarYear]   = useState(today.getFullYear())
+  const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
+
+  const { data: monthCheckins = [] } = useCheckinsByMonth(calendarYear, calendarMonth)
+
+  const isCurrentMonth = calendarYear === today.getFullYear() && calendarMonth === today.getMonth()
 
   useEffect(() => {
     setMood(checkin?.mood ?? 0)
@@ -90,8 +165,24 @@ export function CheckinCard({ date, checkin }: Props) {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const todayStr = format(new Date(), 'yyyy-MM-dd')
-  const pastHistory = history.filter(h => h.date !== todayStr)
+  function prevMonth() {
+    if (calendarMonth === 0) {
+      setCalendarMonth(11)
+      setCalendarYear(y => y - 1)
+    } else {
+      setCalendarMonth(m => m - 1)
+    }
+  }
+
+  function nextMonth() {
+    if (isCurrentMonth) return
+    if (calendarMonth === 11) {
+      setCalendarMonth(0)
+      setCalendarYear(y => y + 1)
+    } else {
+      setCalendarMonth(m => m + 1)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -131,48 +222,28 @@ export function CheckinCard({ date, checkin }: Props) {
         </button>
       </div>
 
-      {/* Botão histórico */}
-      {pastHistory.length > 0 && (
-        <button
-          onClick={() => setHistoryOpen(true)}
-          className="w-full flex items-center justify-between p-4 bg-[#13131f] rounded-2xl border border-[#1e1e32] active:opacity-70"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#2d2b5e] flex items-center justify-center">
-              <i className="ti ti-history text-[#6366f1]" style={{ fontSize: 18 }} />
-            </div>
-            <div className="text-left">
-              <p className="text-[13px] font-semibold text-[#e2e2f0]">Ver histórico</p>
-              <p className="text-[11px] text-[#6b6b80]">{pastHistory.length} registros anteriores</p>
-            </div>
-          </div>
-          <i className="ti ti-chevron-right text-[#3a3a50]" style={{ fontSize: 16 }} />
+      {/* Header do calendário */}
+      <div className="flex items-center justify-between px-1">
+        <button onClick={prevMonth}
+          className="w-8 h-8 flex items-center justify-center text-[#6b6b80] active:text-[#e2e2f0] transition-colors">
+          <i className="ti ti-chevron-left" style={{ fontSize: 18 }} />
         </button>
-      )}
+        <p className="text-[13px] font-semibold text-[#e2e2f0] capitalize">
+          {format(new Date(calendarYear, calendarMonth, 1), 'MMMM yyyy', { locale: ptBR })}
+        </p>
+        <button onClick={nextMonth} disabled={isCurrentMonth}
+          className="w-8 h-8 flex items-center justify-center text-[#6b6b80] active:text-[#e2e2f0] transition-colors disabled:opacity-20">
+          <i className="ti ti-chevron-right" style={{ fontSize: 18 }} />
+        </button>
+      </div>
 
-      {/* BottomSheet — lista de dias */}
-      <BottomSheet open={historyOpen} onClose={() => setHistoryOpen(false)} title="Histórico de check-ins">
-        <div className="flex flex-col gap-2">
-          {pastHistory.map(h => (
-            <button key={h.id}
-              onClick={() => { setSelectedCheckin(h); setHistoryOpen(false) }}
-              className="flex items-center gap-3 p-3 bg-[#13131f] rounded-2xl border border-[#1e1e32] active:bg-[#1a1a2e] text-left w-full"
-            >
-              <div className="flex-1">
-                <p className="text-[13px] font-semibold text-[#e2e2f0] capitalize">
-                  {format(parseISO(h.date), "EEEE, d 'de' MMMM", { locale: ptBR })}
-                </p>
-                <div className="flex gap-3 mt-1">
-                  {h.mood        && <span className="text-[11px] text-[#6b6b80]">Humor {h.mood}/5</span>}
-                  {h.energy      && <span className="text-[11px] text-[#6b6b80]">Energia {h.energy}/5</span>}
-                  {h.sleep_hours && <span className="text-[11px] text-[#6b6b80]">{h.sleep_hours}h sono</span>}
-                </div>
-              </div>
-              <i className="ti ti-chevron-right text-[#3a3a50]" style={{ fontSize: 14 }} />
-            </button>
-          ))}
-        </div>
-      </BottomSheet>
+      {/* Calendário */}
+      <CheckinCalendar
+        checkins={monthCheckins}
+        onSelectCheckin={setSelectedCheckin}
+        month={calendarMonth}
+        year={calendarYear}
+      />
 
       {/* BottomSheet — detalhe de um dia */}
       <BottomSheet

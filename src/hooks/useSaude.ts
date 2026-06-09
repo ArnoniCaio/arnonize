@@ -29,6 +29,23 @@ export function useCheckinHistory() {
   })
 }
 
+export function useCheckinsByMonth(year: number, month: number) {
+  const date  = new Date(year, month, 1)
+  const start = format(startOfMonth(date), 'yyyy-MM-dd')
+  const end   = format(endOfMonth(date),   'yyyy-MM-dd')
+  return useQuery({
+    queryKey: ['checkin_month', year, month],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('daily_checkins').select('*')
+        .gte('date', start).lte('date', end)
+        .order('date', { ascending: true })
+      if (error) throw error
+      return data as DailyCheckin[]
+    }
+  })
+}
+
 export function useWorkoutTemplates() {
   return useQuery({
     queryKey: ['workout_templates'],
@@ -109,6 +126,7 @@ export function useUpsertCheckin() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['daily_checkin'] })
       qc.invalidateQueries({ queryKey: ['checkin_history'] })
+      qc.invalidateQueries({ queryKey: ['checkin_month'] })
     }
   })
 }
