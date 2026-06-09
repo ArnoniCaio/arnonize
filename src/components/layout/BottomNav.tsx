@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
 const mainNav = [
   { label: 'Início',   path: '/',         icon: 'ti-layout-dashboard' },
@@ -53,6 +54,13 @@ export function BottomNav() {
               </NavLink>
             ))}
           </div>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="flex items-center gap-2 mt-3 mx-auto text-[#3a3a50] text-[12px] active:opacity-70"
+          >
+            <i className="ti ti-logout" style={{ fontSize: 14 }} />
+            Sair
+          </button>
         </div>
       )}
 

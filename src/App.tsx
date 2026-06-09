@@ -1,9 +1,11 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from './components/layout/Layout'
 import { Dashboard } from './pages/dashboard/Dashboard'
 import { Agenda } from './pages/agenda/Agenda'
 import { Financas } from './pages/financas/Financas'
 import { Saude } from './pages/saude/Saude'
+import { Login } from './pages/auth/Login'
+import { useAuth } from './hooks/useAuth'
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -15,6 +17,25 @@ function Placeholder({ title }: { title: string }) {
 }
 
 export default function App() {
+  const { session, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-[#6366f1] flex items-center justify-center">
+            <i className="ti ti-leaf text-white" style={{ fontSize: 20 }} />
+          </div>
+          <p className="text-[#3a3a50] text-sm">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return <Login />
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -26,6 +47,7 @@ export default function App() {
         <Route path="cultura" element={<Placeholder title="Cultura & Entretenimento" />} />
         <Route path="hobbies" element={<Placeholder title="Hobbies" />} />
         <Route path="aprendizado" element={<Placeholder title="Aprendizado" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
   )
