@@ -1,5 +1,6 @@
 export interface DailyCheckin {
   id: string
+  user_id: string
   date: string
   mood: number | null
   energy: number | null
@@ -10,6 +11,7 @@ export interface DailyCheckin {
 
 export interface BodyMetric {
   id: string
+  user_id: string
   date: string
   weight_kg:  number | null
   waist_cm:   number | null
@@ -23,6 +25,7 @@ export interface BodyMetric {
 
 export interface WorkoutTemplate {
   id: string
+  user_id: string
   name: string
   description: string | null
   created_at: string
@@ -30,6 +33,7 @@ export interface WorkoutTemplate {
 
 export interface TemplateExercise {
   id: string
+  user_id: string
   template_id: string
   exercise_name: string
   default_sets: number | null
@@ -40,6 +44,7 @@ export interface TemplateExercise {
 
 export interface WorkoutLog {
   id: string
+  user_id: string
   template_id: string | null
   date: string
   duration_minutes: number | null
@@ -50,6 +55,7 @@ export interface WorkoutLog {
 
 export interface WorkoutSet {
   id: string
+  user_id: string
   workout_log_id: string
   exercise_name: string
   set_number: number

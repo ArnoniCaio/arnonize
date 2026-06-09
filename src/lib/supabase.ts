@@ -11,3 +11,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
   }
 })
+
+export async function getCurrentUserId(): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) throw new Error('Não autenticado')
+  return session.user.id
+}

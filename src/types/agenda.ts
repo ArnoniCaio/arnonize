@@ -1,5 +1,6 @@
 export interface Event {
   id: string
+  user_id: string
   category_id: string | null
   title: string
   description: string | null
@@ -13,6 +14,7 @@ export interface Event {
 
 export interface Task {
   id: string
+  user_id: string
   category_id: string | null
   title: string
   priority: 'low' | 'medium' | 'high'
@@ -26,6 +28,7 @@ export interface Task {
 
 export interface Habit {
   id: string
+  user_id: string
   name: string
   tracking_type: 'boolean' | 'scale'
   frequency: 'daily' | 'weekly'
@@ -35,6 +38,7 @@ export interface Habit {
 
 export interface HabitLog {
   id: string
+  user_id: string
   habit_id: string
   date: string
   completed: boolean | null

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
+import { supabase, getCurrentUserId } from '@/lib/supabase'
 import { Account, Transaction, RecurringTransaction, Category, FinancialGoal } from '@/types/financas'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 
@@ -72,8 +72,9 @@ export function useFinancialGoals() {
 export function useCreateAccount() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (data: Omit<Account, 'id' | 'created_at'>) => {
-      const { error } = await supabase.from('accounts').insert(data)
+    mutationFn: async (data: Omit<Account, 'id' | 'user_id' | 'created_at'>) => {
+      const userId = await getCurrentUserId()
+      const { error } = await supabase.from('accounts').insert({ ...data, user_id: userId })
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['accounts'] })
@@ -106,8 +107,9 @@ export function useDeleteAccount() {
 export function useCreateTransaction() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (data: Omit<Transaction, 'id' | 'created_at'>) => {
-      const { error } = await supabase.from('transactions').insert(data)
+    mutationFn: async (data: Omit<Transaction, 'id' | 'user_id' | 'created_at'>) => {
+      const userId = await getCurrentUserId()
+      const { error } = await supabase.from('transactions').insert({ ...data, user_id: userId })
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['transactions'] })
@@ -140,8 +142,9 @@ export function useDeleteTransaction() {
 export function useCreateRecurring() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (data: Omit<RecurringTransaction, 'id' | 'created_at'>) => {
-      const { error } = await supabase.from('recurring_transactions').insert(data)
+    mutationFn: async (data: Omit<RecurringTransaction, 'id' | 'user_id' | 'created_at'>) => {
+      const userId = await getCurrentUserId()
+      const { error } = await supabase.from('recurring_transactions').insert({ ...data, user_id: userId })
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['recurring_transactions'] })
@@ -174,8 +177,9 @@ export function useDeleteRecurring() {
 export function useCreateGoal() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (data: Omit<FinancialGoal, 'id' | 'created_at'>) => {
-      const { error } = await supabase.from('financial_goals').insert(data)
+    mutationFn: async (data: Omit<FinancialGoal, 'id' | 'user_id' | 'created_at'>) => {
+      const userId = await getCurrentUserId()
+      const { error } = await supabase.from('financial_goals').insert({ ...data, user_id: userId })
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['financial_goals'] })

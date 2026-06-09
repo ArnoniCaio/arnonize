@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
+import { supabase, getCurrentUserId } from '@/lib/supabase'
 import { DailyCheckin, BodyMetric, WorkoutTemplate, TemplateExercise, WorkoutLog, WorkoutSet } from '@/types/saude'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 
@@ -118,9 +118,10 @@ export function useBodyMetrics() {
 export function useUpsertCheckin() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (data: Omit<DailyCheckin, 'id' | 'created_at'>) => {
+    mutationFn: async (data: Omit<DailyCheckin, 'id' | 'user_id' | 'created_at'>) => {
+      const userId = await getCurrentUserId()
       const { error } = await supabase
-        .from('daily_checkins').upsert(data, { onConflict: 'date' })
+        .from('daily_checkins').upsert({ ...data, user_id: userId }, { onConflict: 'user_id,date' })
       if (error) throw error
     },
     onSuccess: () => {
@@ -135,11 +136,12 @@ export function useCreateTemplate() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ template, exercises }: {
-      template: Omit<WorkoutTemplate, 'id' | 'created_at'>
-      exercises: Omit<TemplateExercise, 'id' | 'template_id'>[]
+      template: Omit<WorkoutTemplate, 'id' | 'user_id' | 'created_at'>
+      exercises: Omit<TemplateExercise, 'id' | 'user_id' | 'template_id'>[]
     }) => {
+      const userId = await getCurrentUserId()
       const { data, error } = await supabase
-        .from('workout_templates').insert(template).select().single()
+        .from('workout_templates').insert({ ...template, user_id: userId }).select().single()
       if (error) throw error
       if (exercises.length > 0) {
         const { error: exError } = await supabase.from('template_exercises').insert(
@@ -167,11 +169,12 @@ export function useCreateWorkoutLog() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ log, sets }: {
-      log: Omit<WorkoutLog, 'id' | 'created_at'>
-      sets: Omit<WorkoutSet, 'id' | 'workout_log_id'>[]
+      log: Omit<WorkoutLog, 'id' | 'user_id' | 'created_at'>
+      sets: Omit<WorkoutSet, 'id' | 'user_id' | 'workout_log_id'>[]
     }) => {
+      const userId = await getCurrentUserId()
       const { data, error } = await supabase
-        .from('workout_logs').insert(log).select().single()
+        .from('workout_logs').insert({ ...log, user_id: userId }).select().single()
       if (error) throw error
       if (sets.length > 0) {
         const { error: setsError } = await supabase.from('workout_sets').insert(
@@ -198,8 +201,9 @@ export function useDeleteWorkoutLog() {
 export function useCreateBodyMetric() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (data: Omit<BodyMetric, 'id' | 'created_at'>) => {
-      const { error } = await supabase.from('body_metrics').insert(data)
+    mutationFn: async (data: Omit<BodyMetric, 'id' | 'user_id' | 'created_at'>) => {
+      const userId = await getCurrentUserId()
+      const { error } = await supabase.from('body_metrics').insert({ ...data, user_id: userId })
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['body_metrics'] })

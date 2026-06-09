@@ -1,5 +1,6 @@
 export interface Account {
   id: string
+  user_id: string
   name: string
   type: 'checking' | 'savings' | 'wallet' | 'investment' | 'other'
   initial_balance: number
@@ -9,6 +10,7 @@ export interface Account {
 
 export interface Category {
   id: string
+  user_id: string
   name: string
   module: 'finance' | 'tasks'
   color: string | null
@@ -17,6 +19,7 @@ export interface Category {
 
 export interface Transaction {
   id: string
+  user_id: string
   account_id: string
   category_id: string | null
   type: 'income' | 'expense'
@@ -30,6 +33,7 @@ export interface Transaction {
 
 export interface RecurringTransaction {
   id: string
+  user_id: string
   account_id: string
   category_id: string | null
   type: 'income' | 'expense'
@@ -43,6 +47,7 @@ export interface RecurringTransaction {
 
 export interface Budget {
   id: string
+  user_id: string
   category_id: string
   amount: number
   month: number
@@ -52,6 +57,7 @@ export interface Budget {
 
 export interface FinancialGoal {
   id: string
+  user_id: string
   name: string
   description: string | null
   target_amount: number

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
+import { supabase, getCurrentUserId } from '@/lib/supabase'
 import { Event, Task, Habit, HabitLog } from '@/types/agenda'
 import { format } from 'date-fns'
 
@@ -85,9 +85,10 @@ export function useToggleHabit() {
     mutationFn: async ({
       habit_id, date, completed, score
     }: { habit_id: string; date: string; completed?: boolean; score?: number }) => {
+      const userId = await getCurrentUserId()
       const { error } = await supabase
         .from('habit_logs')
-        .upsert({ habit_id, date, completed, score }, { onConflict: 'habit_id,date' })
+        .upsert({ habit_id, date, completed, score, user_id: userId }, { onConflict: 'habit_id,date' })
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['habit_logs'] })
@@ -97,8 +98,9 @@ export function useToggleHabit() {
 export function useCreateEvent() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (data: Omit<Event, 'id' | 'created_at'>) => {
-      const { data: result, error } = await supabase.from('events').insert(data).select()
+    mutationFn: async (data: Omit<Event, 'id' | 'user_id' | 'created_at'>) => {
+      const userId = await getCurrentUserId()
+      const { data: result, error } = await supabase.from('events').insert({ ...data, user_id: userId }).select()
       if (error) {
         console.error('useCreateEvent error:', error)
         throw error
@@ -113,8 +115,9 @@ export function useCreateEvent() {
 export function useCreateTask() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (data: Omit<Task, 'id' | 'created_at'>) => {
-      const { data: result, error } = await supabase.from('tasks').insert(data).select()
+    mutationFn: async (data: Omit<Task, 'id' | 'user_id' | 'created_at'>) => {
+      const userId = await getCurrentUserId()
+      const { data: result, error } = await supabase.from('tasks').insert({ ...data, user_id: userId }).select()
       if (error) {
         console.error('useCreateTask error:', error)
         throw error
@@ -129,8 +132,9 @@ export function useCreateTask() {
 export function useCreateHabit() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (data: Omit<Habit, 'id' | 'created_at'>) => {
-      const { data: result, error } = await supabase.from('habits').insert(data).select()
+    mutationFn: async (data: Omit<Habit, 'id' | 'user_id' | 'created_at'>) => {
+      const userId = await getCurrentUserId()
+      const { data: result, error } = await supabase.from('habits').insert({ ...data, user_id: userId }).select()
       if (error) {
         console.error('useCreateHabit error:', error)
         throw error
