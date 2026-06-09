@@ -138,7 +138,7 @@ export function Saude() {
                 {templates.map(t => (
                   <SwipeableRow key={t.id}
                     actions={[
-                      { icon: 'ti-trash', color: '#f09595', bg: '#2d1515', onPress: () => deleteTemplate.mutate(t.id) },
+                      { icon: 'ti-trash', color: 'var(--swipe-delete-color)', bg: 'var(--swipe-delete-bg)', onPress: () => deleteTemplate.mutate(t.id) },
                     ]}
                   >
                     <div className="flex items-center gap-3 py-3 border-b border-[#13131f] bg-[#0a0a0f]">
@@ -181,7 +181,7 @@ export function Saude() {
               workoutLogs.map(log => (
                 <SwipeableRow key={log.id}
                   actions={[
-                    { icon: 'ti-trash', color: '#f09595', bg: '#2d1515', onPress: () => deleteWorkoutLog.mutate(log.id) },
+                    { icon: 'ti-trash', color: 'var(--swipe-delete-color)', bg: 'var(--swipe-delete-bg)', onPress: () => deleteWorkoutLog.mutate(log.id) },
                   ]}
                 >
                   <div className="flex items-center gap-3 py-3 border-b border-[#13131f] bg-[#0a0a0f]">

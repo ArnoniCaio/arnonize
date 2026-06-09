@@ -19,8 +19,8 @@ export function TransactionRow({ transaction, categories, onEdit, onTap }: Props
   return (
     <SwipeableRow
       actions={[
-        { icon: 'ti-pencil', color: '#6366f1', bg: '#2d2b5e', onPress: () => onEdit(transaction) },
-        { icon: 'ti-trash',  color: '#f09595', bg: '#2d1515', onPress: () => deleteTransaction.mutate(transaction.id) },
+        { icon: 'ti-pencil', color: 'var(--swipe-edit-color)',   bg: 'var(--swipe-edit-bg)',   onPress: () => onEdit(transaction) },
+        { icon: 'ti-trash',  color: 'var(--swipe-delete-color)', bg: 'var(--swipe-delete-bg)', onPress: () => deleteTransaction.mutate(transaction.id) },
       ]}
     >
       <div

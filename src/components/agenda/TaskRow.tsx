@@ -22,8 +22,8 @@ export function TaskRow({ task, onEdit, onTap }: Props) {
   return (
     <SwipeableRow
       actions={[
-        { icon: 'ti-pencil', color: '#6366f1', bg: '#2d2b5e', onPress: () => onEdit(task) },
-        { icon: 'ti-trash',  color: '#f09595', bg: '#2d1515', onPress: () => deleteTask.mutate(task.id) },
+        { icon: 'ti-pencil', color: 'var(--swipe-edit-color)',   bg: 'var(--swipe-edit-bg)',   onPress: () => onEdit(task) },
+        { icon: 'ti-trash',  color: 'var(--swipe-delete-color)', bg: 'var(--swipe-delete-bg)', onPress: () => deleteTask.mutate(task.id) },
       ]}
     >
       <div className="flex items-center gap-3 py-2.5 border-b border-[#13131f] bg-[#0a0a0f]">

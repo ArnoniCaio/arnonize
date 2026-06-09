@@ -21,8 +21,8 @@ export function EventCard({ event, onEdit, onTap }: Props) {
   return (
     <SwipeableRow
       actions={[
-        { icon: 'ti-pencil', color: '#6366f1', bg: '#2d2b5e', onPress: () => onEdit(event) },
-        { icon: 'ti-trash',  color: '#f09595', bg: '#2d1515', onPress: () => deleteEvent.mutate(event.id) },
+        { icon: 'ti-pencil', color: 'var(--swipe-edit-color)',   bg: 'var(--swipe-edit-bg)',   onPress: () => onEdit(event) },
+        { icon: 'ti-trash',  color: 'var(--swipe-delete-color)', bg: 'var(--swipe-delete-bg)', onPress: () => deleteEvent.mutate(event.id) },
       ]}
     >
       <div

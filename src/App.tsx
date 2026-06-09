@@ -6,6 +6,7 @@ import { Financas } from './pages/financas/Financas'
 import { Saude } from './pages/saude/Saude'
 import { Login } from './pages/auth/Login'
 import { useAuth } from './hooks/useAuth'
+import { ThemeProvider } from './context/ThemeContext'
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -21,7 +22,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-base)' }}>
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-[#6366f1] flex items-center justify-center">
             <i className="ti ti-leaf text-white" style={{ fontSize: 20 }} />
@@ -37,18 +38,20 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="agenda" element={<Agenda />} />
-        <Route path="financas" element={<Financas />} />
-        <Route path="saude" element={<Saude />} />
-        <Route path="metas" element={<Placeholder title="Metas & OKRs" />} />
-        <Route path="cultura" element={<Placeholder title="Cultura & Entretenimento" />} />
-        <Route path="hobbies" element={<Placeholder title="Hobbies" />} />
-        <Route path="aprendizado" element={<Placeholder title="Aprendizado" />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+    <ThemeProvider>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="agenda" element={<Agenda />} />
+          <Route path="financas" element={<Financas />} />
+          <Route path="saude" element={<Saude />} />
+          <Route path="metas" element={<Placeholder title="Metas & OKRs" />} />
+          <Route path="cultura" element={<Placeholder title="Cultura & Entretenimento" />} />
+          <Route path="hobbies" element={<Placeholder title="Hobbies" />} />
+          <Route path="aprendizado" element={<Placeholder title="Aprendizado" />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </ThemeProvider>
   )
 }

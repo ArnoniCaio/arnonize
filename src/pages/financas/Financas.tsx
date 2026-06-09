@@ -167,8 +167,8 @@ export function Financas() {
                 return (
                   <SwipeableRow key={r.id}
                     actions={[
-                      { icon: 'ti-pencil', color: '#6366f1', bg: '#2d2b5e', onPress: () => { setEditingRecurring(r); setTimeout(() => setActiveForm('recurring'), 50) } },
-                      { icon: 'ti-trash',  color: '#f09595', bg: '#2d1515', onPress: () => deleteRecurring.mutate(r.id) },
+                      { icon: 'ti-pencil', color: 'var(--swipe-edit-color)',   bg: 'var(--swipe-edit-bg)',   onPress: () => { setEditingRecurring(r); setTimeout(() => setActiveForm('recurring'), 50) } },
+                      { icon: 'ti-trash',  color: 'var(--swipe-delete-color)', bg: 'var(--swipe-delete-bg)', onPress: () => deleteRecurring.mutate(r.id) },
                     ]}
                   >
                     <div className="flex items-center gap-3 py-3 border-b border-[#13131f] bg-[#0a0a0f]">

@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useTheme } from '@/context/ThemeContext'
 
 const mainNav = [
   { label: 'Início',   path: '/',         icon: 'ti-layout-dashboard' },
@@ -18,6 +19,7 @@ const moreNav = [
 
 export function BottomNav() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <>
@@ -38,6 +40,13 @@ export function BottomNav() {
             Mais módulos
           </p>
           <div className="grid grid-cols-4 gap-2">
+            <button
+              onClick={toggleTheme}
+              className="flex flex-col items-center gap-2 p-3 rounded-xl text-center transition-colors bg-[#13131f] text-[#6b6b80]"
+            >
+              <i className={`ti ${theme === 'dark' ? 'ti-sun' : 'ti-moon'} text-xl`} />
+              <span className="text-[10px] font-medium leading-tight">Tema</span>
+            </button>
             {moreNav.map(({ label, path, icon }) => (
               <NavLink
                 key={path}
