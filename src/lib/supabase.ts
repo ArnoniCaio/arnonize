@@ -14,6 +14,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 export async function getCurrentUserId(): Promise<string> {
   const { data: { session } } = await supabase.auth.getSession()
-  if (!session) throw new Error('Não autenticado')
-  return session.user.id
+  if (session?.user?.id) return session.user.id
+
+  const { data: { session: refreshed }, error } = await supabase.auth.refreshSession()
+  if (error || !refreshed?.user?.id) throw new Error('Não autenticado')
+  return refreshed.user.id
 }

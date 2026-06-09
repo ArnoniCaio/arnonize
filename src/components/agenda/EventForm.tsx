@@ -21,6 +21,7 @@ export function EventForm({ open, onClose, defaultDate, editing }: Props) {
   const [date, setDate]         = useState(format(defaultDate, 'yyyy-MM-dd'))
   const [time, setTime]         = useState('')
   const [duration, setDuration] = useState('')
+  const [error, setError]       = useState<string | null>(null)
 
   useEffect(() => {
     if (editing) {
@@ -47,12 +48,18 @@ export function EventForm({ open, onClose, defaultDate, editing }: Props) {
       recurrence: null,
       recurrence_end: null,
     }
-    if (editing) {
-      await update.mutateAsync({ id: editing.id, ...payload })
-    } else {
-      await create.mutateAsync(payload)
+    try {
+      setError(null)
+      if (editing) {
+        await update.mutateAsync({ id: editing.id, ...payload })
+      } else {
+        await create.mutateAsync(payload)
+      }
+      onClose()
+    } catch (err) {
+      setError('Erro ao salvar. Tente novamente.')
+      console.error('EventForm error:', err)
     }
-    onClose()
   }
 
   const isPending = create.isPending || update.isPending
@@ -87,6 +94,7 @@ export function EventForm({ open, onClose, defaultDate, editing }: Props) {
         className="w-full bg-[#6366f1] text-white rounded-xl py-3 text-[14px] font-semibold mt-2 disabled:opacity-40 transition-opacity">
         {isPending ? 'Salvando...' : editing ? 'Salvar alterações' : 'Salvar evento'}
       </button>
+      {error && <p className="text-[12px] text-[#e24b4a] text-center mt-2">{error}</p>}
     </BottomSheet>
   )
 }
