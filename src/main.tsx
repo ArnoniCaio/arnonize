@@ -3,7 +3,7 @@ import { StrictMode } from 'react'
 
 registerSW({
   immediate: true,
-  onRegistered(r) {
+  onRegistered(r: ServiceWorkerRegistration | undefined) {
     r && setInterval(() => r.update(), 60 * 60 * 1000)
   },
 })
