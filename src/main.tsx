@@ -1,4 +1,12 @@
+import { registerSW } from 'virtual:pwa-register'
 import { StrictMode } from 'react'
+
+registerSW({
+  immediate: true,
+  onRegistered(r) {
+    r && setInterval(() => r.update(), 60 * 60 * 1000)
+  },
+})
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
