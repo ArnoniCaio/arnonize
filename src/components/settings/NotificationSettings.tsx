@@ -56,6 +56,7 @@ export function NotificationSettings() {
 
   return (
     <div className="flex flex-col gap-4">
+      <p className="text-[10px] text-[#6366f1]">build check v1 — {new Date().toISOString().slice(0,10)}</p>
       <div className="bg-[#13131f] border border-[#1e1e32] rounded-2xl p-4 flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-white">Ativar notificações</p>

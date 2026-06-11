@@ -14,6 +14,9 @@ export function usePushNotifications() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    console.log('[push] hook montado, permission:', Notification.permission)
+    console.log('[push] serviceWorker disponível:', 'serviceWorker' in navigator)
+    console.log('[push] PushManager disponível:', 'PushManager' in window)
     setPermission(Notification.permission)
     checkSubscription()
   }, [])
