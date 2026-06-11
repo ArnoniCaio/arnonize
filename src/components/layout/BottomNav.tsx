@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTheme } from '@/context/ThemeContext'
+import { NotificationSettings } from '@/components/settings/NotificationSettings'
 
 const mainNav = [
   { label: 'Início',   path: '/',         icon: 'ti-layout-dashboard' },
@@ -19,15 +20,39 @@ const moreNav = [
 
 export function BottomNav() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
+
+  function openNotif() {
+    setDrawerOpen(false)
+    setNotifOpen(true)
+  }
+
+  function closeAll() {
+    setDrawerOpen(false)
+    setNotifOpen(false)
+  }
 
   return (
     <>
-      {drawerOpen && (
+      {(drawerOpen || notifOpen) && (
         <div
           className="fixed inset-0 z-40 bg-black/60"
-          onClick={() => setDrawerOpen(false)}
+          onClick={closeAll}
         />
+      )}
+
+      {notifOpen && (
+        <div
+          className="fixed left-0 right-0 z-50 bg-[#0d0d14] border-t border-[#1e1e2e] rounded-t-2xl p-4 max-h-[80vh] overflow-y-auto"
+          style={{ bottom: 'calc(56px + env(safe-area-inset-bottom))' }}
+        >
+          <div className="w-10 h-1 bg-[#1e1e32] rounded-full mx-auto mb-4" />
+          <p className="text-[11px] font-semibold text-[#3a3a50] uppercase tracking-widest mb-4 px-1">
+            Notificações
+          </p>
+          <NotificationSettings />
+        </div>
       )}
 
       {drawerOpen && (
@@ -46,6 +71,13 @@ export function BottomNav() {
             >
               <i className={`ti ${theme === 'dark' ? 'ti-sun' : 'ti-moon'} text-xl`} />
               <span className="text-[10px] font-medium leading-tight">Tema</span>
+            </button>
+            <button
+              onClick={openNotif}
+              className="flex flex-col items-center gap-2 p-3 rounded-xl text-center transition-colors bg-[#13131f] text-[#6b6b80]"
+            >
+              <i className="ti ti-bell text-xl" />
+              <span className="text-[10px] font-medium leading-tight">Notificações</span>
             </button>
             {moreNav.map(({ label, path, icon }) => (
               <NavLink
