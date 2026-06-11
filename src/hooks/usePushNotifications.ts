@@ -14,9 +14,13 @@ export function usePushNotifications() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    console.log('[push] hook montado, permission:', Notification.permission)
+    console.log('[push] hook montado, permission:', typeof Notification !== 'undefined' ? Notification.permission : 'indefinido')
     console.log('[push] serviceWorker disponível:', 'serviceWorker' in navigator)
     console.log('[push] PushManager disponível:', 'PushManager' in window)
+    if (typeof Notification === 'undefined') {
+      setPermission('default')
+      return
+    }
     setPermission(Notification.permission)
     checkSubscription()
   }, [])
@@ -32,6 +36,7 @@ export function usePushNotifications() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
     setError(null)
     try {
+      if (typeof Notification === 'undefined') return
       const perm = await Notification.requestPermission()
       setPermission(perm)
       if (perm !== 'granted') return
