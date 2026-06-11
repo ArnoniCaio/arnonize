@@ -21,7 +21,7 @@ const defaults: Preferences = {
 }
 
 export function NotificationSettings() {
-  const { subscribe, unsubscribe, isSubscribed, permission } = usePushNotifications()
+  const { subscribe, unsubscribe, isSubscribed, permission, error } = usePushNotifications()
   const [prefs, setPrefs] = useState<Preferences>(defaults)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -81,6 +81,10 @@ export function NotificationSettings() {
           />
         </button>
       </div>
+
+      {error && (
+        <p className="text-[12px] text-[#f87171] px-1">{error}</p>
+      )}
 
       {permission === 'denied' && (
         <p className="text-[12px] text-[#f87171] px-1">

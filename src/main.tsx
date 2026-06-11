@@ -3,8 +3,11 @@ import { StrictMode } from 'react'
 
 registerSW({
   immediate: true,
+  onNeedRefresh() {
+    window.location.reload()
+  },
   onRegistered(r: ServiceWorkerRegistration | undefined) {
-    r && setInterval(() => r.update(), 60 * 60 * 1000)
+    r && setInterval(() => r.update(), 5 * 60 * 1000)
   },
 })
 import { createRoot } from 'react-dom/client'
