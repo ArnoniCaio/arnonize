@@ -1,15 +1,21 @@
 import { registerSW } from 'virtual:pwa-register'
 import { StrictMode } from 'react'
 
-registerSW({
+const updateSW = registerSW({
   immediate: true,
-  onNeedRefresh() {
-    window.location.reload()
+  onRegisteredSW(_swUrl, r) {
+    if (r) {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') r.update()
+      })
+      setInterval(() => r.update(), 60 * 1000)
+    }
   },
-  onRegistered(r: ServiceWorkerRegistration | undefined) {
-    r && setInterval(() => r.update(), 5 * 60 * 1000)
+  onNeedRefresh() {
+    updateSW(true)
   },
 })
+
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'

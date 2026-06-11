@@ -3,7 +3,12 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 
+const buildTime = new Date().toISOString()
+
 export default defineConfig({
+  define: {
+    '__APP_VERSION__': JSON.stringify(buildTime),
+  },
   plugins: [
     react(),
     VitePWA({

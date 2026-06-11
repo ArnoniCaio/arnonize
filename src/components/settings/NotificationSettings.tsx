@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { supabase, getCurrentUserId } from '@/lib/supabase'
+import { APP_VERSION } from '@/version'
 
 interface Preferences {
   checkin_enabled: boolean
@@ -139,6 +140,7 @@ export function NotificationSettings() {
           </button>
         </>
       )}
+      <p className="text-[10px] text-[#3a3a50] text-center mt-2">v{APP_VERSION}</p>
     </div>
   )
 }
