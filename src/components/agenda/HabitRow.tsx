@@ -1,5 +1,5 @@
 import { Habit, HabitLog } from '@/types/agenda'
-import { useToggleHabit, useDeleteHabit } from '@/hooks/useAgenda'
+import { useToggleHabit, useDeleteHabit, useHabitStreak } from '@/hooks/useAgenda'
 import { SwipeableRow } from '@/components/ui/SwipeableRow'
 import { format } from 'date-fns'
 
@@ -14,6 +14,7 @@ interface Props {
 export function HabitRow({ habit, log, date, onEdit, onTap }: Props) {
   const toggle = useToggleHabit()
   const deleteHabit = useDeleteHabit()
+  const { data: streak = 0 } = useHabitStreak(habit.id)
   const dateStr = format(date, 'yyyy-MM-dd')
 
   return (
@@ -34,11 +35,17 @@ export function HabitRow({ habit, log, date, onEdit, onTap }: Props) {
             >
               {log?.completed && <i className="ti ti-check text-[#6366f1]" style={{ fontSize: 12 }} />}
             </button>
-            <p className="flex-1 text-[13px] text-[#a5a5c0]" onClick={() => onTap(habit)}>{habit.name}</p>
+            <div className="flex-1 min-w-0" onClick={() => onTap(habit)}>
+              <p className="text-[13px] text-[#a5a5c0]">{habit.name}</p>
+              {streak >= 2 && <span className="text-[11px] text-[#ba7517]">🔥 {streak} dias seguidos</span>}
+            </div>
           </>
         ) : (
           <>
-            <p className="flex-1 text-[13px] text-[#a5a5c0]" onClick={() => onTap(habit)}>{habit.name}</p>
+            <div className="flex-1 min-w-0" onClick={() => onTap(habit)}>
+              <p className="text-[13px] text-[#a5a5c0]">{habit.name}</p>
+              {streak >= 2 && <span className="text-[11px] text-[#ba7517]">🔥 {streak} dias seguidos</span>}
+            </div>
             <div className="flex gap-1.5">
               {[1, 2, 3, 4, 5].map(v => (
                 <button

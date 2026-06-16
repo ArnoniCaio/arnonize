@@ -91,7 +91,49 @@ export function useToggleHabit() {
         .upsert({ habit_id, date, completed, score, user_id: userId }, { onConflict: 'habit_id,date' })
       if (error) throw error
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['habit_logs'] })
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['habit_logs'] })
+      qc.invalidateQueries({ queryKey: ['habit_streak'] })
+    }
+  })
+}
+
+function calcStreak(logs: { date: string; completed: boolean | null; score: number | null }[]): number {
+  const done = new Set(
+    logs.filter(l => l.completed === true || (l.score ?? 0) > 0).map(l => l.date)
+  )
+  let streak = 0
+  const cursor = new Date()
+  const todayStr = format(cursor, 'yyyy-MM-dd')
+  if (!done.has(todayStr)) {
+    cursor.setDate(cursor.getDate() - 1)
+  }
+  while (true) {
+    const ds = format(cursor, 'yyyy-MM-dd')
+    if (done.has(ds)) {
+      streak++
+      cursor.setDate(cursor.getDate() - 1)
+    } else {
+      break
+    }
+  }
+  return streak
+}
+
+export function useHabitStreak(habitId: string) {
+  return useQuery({
+    queryKey: ['habit_streak', habitId],
+    queryFn: async () => {
+      const since = format(new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd')
+      const { data, error } = await supabase
+        .from('habit_logs')
+        .select('date, completed, score')
+        .eq('habit_id', habitId)
+        .gte('date', since)
+        .order('date', { ascending: false })
+      if (error) throw error
+      return calcStreak(data ?? [])
+    }
   })
 }
 
