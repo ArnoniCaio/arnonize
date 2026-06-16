@@ -46,6 +46,8 @@ body {
   --amber:          #ba7517;
   --red:            #e24b4a;
   --safe-bottom:      env(safe-area-inset-bottom, 0px);
+  --swipe-postpone-bg:    #2d2b5e;
+  --swipe-postpone-color: #6366f1;
   --swipe-edit-bg:    #2d2b5e;
   --swipe-edit-color: #6366f1;
   --swipe-delete-bg:  #2d1515;
@@ -67,6 +69,8 @@ body {
   --teal:           #1d9e75;
   --amber:          #ba7517;
   --red:              #e24b4a;
+  --swipe-postpone-bg:    #e0e0fa;
+  --swipe-postpone-color: #6366f1;
   --swipe-edit-bg:    #e0e0fa;
   --swipe-edit-color: #6366f1;
   --swipe-delete-bg:  #fde8e8;

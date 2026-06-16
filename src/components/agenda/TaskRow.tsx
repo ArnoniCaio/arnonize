@@ -1,6 +1,7 @@
 import { Task } from '@/types/agenda'
-import { useToggleTask, useDeleteTask } from '@/hooks/useAgenda'
+import { useToggleTask, useDeleteTask, useUpdateTask } from '@/hooks/useAgenda'
 import { SwipeableRow } from '@/components/ui/SwipeableRow'
+import { addDays, format } from 'date-fns'
 
 interface Props {
   task: Task
@@ -17,13 +18,20 @@ const PRIORITY_STYLES = {
 export function TaskRow({ task, onEdit, onTap }: Props) {
   const toggle = useToggleTask()
   const deleteTask = useDeleteTask()
+  const updateTask = useUpdateTask()
   const pri = PRIORITY_STYLES[task.priority]
+
+  function handlePostpone() {
+    const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd')
+    updateTask.mutate({ id: task.id, due_date: tomorrow })
+  }
 
   return (
     <SwipeableRow
       actions={[
-        { icon: 'ti-pencil', color: 'var(--swipe-edit-color)',   bg: 'var(--swipe-edit-bg)',   onPress: () => onEdit(task) },
-        { icon: 'ti-trash',  color: 'var(--swipe-delete-color)', bg: 'var(--swipe-delete-bg)', onPress: () => deleteTask.mutate(task.id) },
+        { icon: 'ti-calendar-plus', color: 'var(--swipe-postpone-color)', bg: 'var(--swipe-postpone-bg)', onPress: handlePostpone },
+        { icon: 'ti-pencil',        color: 'var(--swipe-edit-color)',      bg: 'var(--swipe-edit-bg)',      onPress: () => onEdit(task) },
+        { icon: 'ti-trash',         color: 'var(--swipe-delete-color)',    bg: 'var(--swipe-delete-bg)',    onPress: () => deleteTask.mutate(task.id) },
       ]}
     >
       <div className="flex items-center gap-3 py-2.5 border-b border-[#13131f] bg-[#0a0a0f]">
