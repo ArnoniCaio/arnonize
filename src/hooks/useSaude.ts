@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, getCurrentUserId } from '@/lib/supabase'
-import { DailyCheckin, BodyMetric, WorkoutTemplate, TemplateExercise, WorkoutLog, WorkoutSet } from '@/types/saude'
+import { DailyCheckin, BodyMetric, WorkoutTemplate, TemplateExercise, WorkoutLog, WorkoutSet, ExamResult } from '@/types/saude'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 
 export function useTodayCheckin(date: Date) {
@@ -208,4 +208,63 @@ export function useCreateBodyMetric() {
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['body_metrics'] })
   })
+}
+
+export function useExamResults() {
+  return useQuery({
+    queryKey: ['exam_results'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('exam_results').select('*').order('date', { ascending: false })
+      if (error) throw error
+      return data as ExamResult[]
+    }
+  })
+}
+
+export function useCreateExamResult() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ date, title, notes, file }: {
+      date: string
+      title: string
+      notes: string | null
+      file: File
+    }) => {
+      const userId = await getCurrentUserId()
+      const safeName = file.name.replace(/[^a-zA-Z0-9.\-]/g, '-')
+      const path = `${userId}/${Date.now()}-${safeName}`
+      const file_type: 'pdf' | 'image' = file.type === 'application/pdf' ? 'pdf' : 'image'
+
+      const { error: uploadError } = await supabase.storage
+        .from('exam-results').upload(path, file)
+      if (uploadError) throw uploadError
+
+      const { error } = await supabase.from('exam_results').insert({
+        user_id: userId, date, title, notes, file_path: path, file_type,
+      })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['exam_results'] })
+  })
+}
+
+export function useDeleteExamResult() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (exam: ExamResult) => {
+      if (exam.file_path) {
+        await supabase.storage.from('exam-results').remove([exam.file_path])
+      }
+      const { error } = await supabase.from('exam_results').delete().eq('id', exam.id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['exam_results'] })
+  })
+}
+
+export async function getExamFileUrl(filePath: string): Promise<string | null> {
+  const { data } = await supabase.storage.from('exam-results')
+    .createSignedUrl(filePath, 3600)
+  return data?.signedUrl ?? null
 }

@@ -6,17 +6,20 @@ import { useTodayCheckin, useWorkoutTemplates, useWorkoutLogs, useBodyMetrics, u
 import { CheckinCard } from '@/components/saude/CheckinCard'
 import { TemplateForm } from '@/components/saude/TemplateForm'
 import { BodyMetricForm } from '@/components/saude/BodyMetricForm'
+import { ExamForm } from '@/components/saude/ExamForm'
+import { ExamList } from '@/components/saude/ExamList'
 import { ActiveWorkoutScreen } from '@/components/saude/ActiveWorkout'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { SwipeableRow } from '@/components/ui/SwipeableRow'
 import { WorkoutTemplate, ActiveWorkout, ActiveSet } from '@/types/saude'
 
-type FormType = 'template' | 'metric' | null
-type Section  = 'checkin' | 'treinos' | 'metricas'
+type FormType = 'template' | 'metric' | 'exame' | null
+type Section  = 'checkin' | 'treinos' | 'metricas' | 'exames'
 
 const CREATE_OPTIONS = [
   { type: 'template' as FormType, icon: 'ti-clipboard-list', label: 'Nova ficha', desc: 'Criar ficha de treino' },
   { type: 'metric'   as FormType, icon: 'ti-ruler-measure',  label: 'Métricas',   desc: 'Peso e medidas corporais' },
+  { type: 'exame'    as FormType, icon: 'ti-file-text',      label: 'Exame',      desc: 'Adicionar resultado de exame' },
 ]
 
 export function Saude() {
@@ -100,6 +103,7 @@ export function Saude() {
             { key: 'checkin',  label: 'Check-in' },
             { key: 'treinos',  label: 'Treinos' },
             { key: 'metricas', label: 'Métricas' },
+            { key: 'exames',   label: 'Exames' },
           ] as const).map(({ key, label }) => (
             <button key={key} onClick={() => setActiveSection(key)}
               className={`flex-1 py-2 rounded-xl text-[13px] font-medium transition-colors ${
@@ -285,6 +289,8 @@ export function Saude() {
             )}
           </div>
         )}
+        {activeSection === 'exames' && <ExamList />}
+
       </div>
 
       {/* Picker de criação */}
@@ -364,6 +370,7 @@ export function Saude() {
 
       <TemplateForm   open={activeForm === 'template'} onClose={() => setActiveForm(null)} />
       <BodyMetricForm open={activeForm === 'metric'}   onClose={() => setActiveForm(null)} />
+      <ExamForm       open={activeForm === 'exame'}    onClose={() => setActiveForm(null)} />
     </div>
   )
 }

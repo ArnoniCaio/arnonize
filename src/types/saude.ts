@@ -77,3 +77,14 @@ export interface ActiveWorkout {
   startedAt: Date
   sets: ActiveSet[]
 }
+
+export interface ExamResult {
+  id: string
+  user_id: string
+  date: string
+  title: string
+  notes: string | null
+  file_path: string | null
+  file_type: 'pdf' | 'image' | null
+  created_at: string
+}
